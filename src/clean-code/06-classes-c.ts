@@ -1,5 +1,6 @@
 ;(() => {
-    // No aplicando el principio de responsabilidad única
+    // Aplicando el principio de responsabilidad única
+    // Priorizar la composición frente de la herencia
 
     type Gender = 'M' | 'F'
 
@@ -22,20 +23,16 @@
     }
 
     interface UserProps {
-        birthdate: Date
         email: string
-        gender: Gender
-        name: string
         role: string
     }
 
-    class User extends Person {
-        public lastAccess: Date
+    class User {
         public email: string
+        public lastAccess: Date
         public role: string
 
-        constructor({ birthdate, email, gender, name, role }: UserProps) {
-            super({ name, gender, birthdate })
+        constructor({ email, role }: UserProps) {
             this.email = email
             this.role = role
             this.lastAccess = new Date()
@@ -46,30 +43,46 @@
         }
     }
 
-    interface UserSettingsProps {
-        birthdate: Date
-        email: string
-        gender: Gender
+    interface SettingsProps {
         lastOpenFolder: string
-        name: string
-        role: string
         workingDirectory: string
     }
-    class UserSettings extends User {
+    class Settings {
         public workingDirectory: string
         public lastOpenFolder: string
+        constructor({ workingDirectory, lastOpenFolder }: SettingsProps) {
+            this.workingDirectory = workingDirectory
+            this.lastOpenFolder = lastOpenFolder
+        }
+    }
+
+    interface UserSettingsProps {
+        name: string
+        gender: Gender
+        birthdate: Date
+        email: string
+        role: string
+        lastOpenFolder: string
+        workingDirectory: string
+    }
+
+    class UserSettings {
+        public person: Person
+        public user: User
+        public settings: Settings
+
         constructor({
-            workingDirectory,
-            lastOpenFolder,
-            email,
-            role,
             name,
             gender,
             birthdate,
+            email,
+            role,
+            lastOpenFolder,
+            workingDirectory,
         }: UserSettingsProps) {
-            super({ email, role, name, gender, birthdate })
-            this.workingDirectory = workingDirectory
-            this.lastOpenFolder = lastOpenFolder
+            this.person = new Person({ name, gender, birthdate })
+            this.user = new User({ email, role })
+            this.settings = new Settings({ lastOpenFolder, workingDirectory })
         }
     }
 
@@ -84,5 +97,5 @@
     })
 
     console.log({ userSettings })
-    console.log(userSettings.checkCredentials())
+    console.log(userSettings.user.checkCredentials())
 })()
